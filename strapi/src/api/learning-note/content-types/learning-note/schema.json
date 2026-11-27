@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "learning_notes",
+  "info": {
+    "singularName": "learning-note",
+    "pluralName": "learning-notes",
+    "displayName": "Learning Note"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "youtubeId": {
+      "type": "string",
+      "required": true
+    },
+    "chapterId": {
+      "type": "string",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "body": {
+      "type": "text",
+      "required": true,
+      "maxLength": 10000
+    }
+  }
+}

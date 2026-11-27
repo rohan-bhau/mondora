@@ -1,0 +1,24 @@
+{
+  "name": "oneminute-learn-strapi",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "strapi develop --no-watch-admin",
+    "build": "strapi build",
+    "start": "strapi start"
+  },
+  "dependencies": {
+    "@strapi/strapi": "5.61.0",
+    "better-sqlite3": "12.8.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.0",
+    "styled-components": "^6.1.0"
+  },
+  "engines": {
+    "node": ">=22 <=26"
+  },
+  "strapi": {
+    "uuid": false
+  }
+}

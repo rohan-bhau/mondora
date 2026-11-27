@@ -1,0 +1,1 @@
+export default ['strapi::logger', 'strapi::errors', 'strapi::security', { name: 'strapi::cors', config: { origin: [], credentials: false } }, 'strapi::poweredBy', 'strapi::query', { name: 'strapi::body', config: { jsonLimit: '32mb' } }, 'strapi::session', 'strapi::favicon', 'strapi::public'];

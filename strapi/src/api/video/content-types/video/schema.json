@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "videos",
+  "info": {
+    "singularName": "video",
+    "pluralName": "videos",
+    "displayName": "Video"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "youtubeId": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "payload": {
+      "type": "json",
+      "required": true
+    }
+  }
+}
