@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { videoId, chunks, chapterSegments, retrieve } from "./core";
-import { importYouTube } from "./youtube";
+import { importYouTube, importFromTranscript } from "./youtube";
 import { summary, SUMMARY_VERSION } from "./summaries";
 import { outline } from "./chapters";
 import { explain } from "./tutor";
@@ -70,10 +70,20 @@ export async function dispatch(
   }
   if (method === "POST" && path.length === 1 && path[0] === "import") {
     const id = videoId(typeof body.url === "string" ? body.url : "");
+    const pastedTranscript =
+      typeof body.transcript === "string" ? body.transcript.trim() : "";
+    if (pastedTranscript.length > 500000) {
+      throw new Error("Transcript is too large (maximum 500,000 characters).");
+    }
     return serial(id, async () => {
       let row = await storage.findVideo(id);
       const reused = Boolean(row);
-      if (!row) row = await storage.createVideo(await importYouTube(id));
+      if (!row) {
+        const imported = pastedTranscript
+          ? await importFromTranscript(id, pastedTranscript)
+          : await importYouTube(id);
+        row = await storage.createVideo(imported);
+      }
       return { video: publicVideo(row.payload), reused };
     });
   }

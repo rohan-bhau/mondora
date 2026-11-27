@@ -39,6 +39,112 @@ export function parseCaptions(data: {events?:{segs?:{utf8?:string}[];tStartMs:nu
   }
   return segments.sort((a,b)=>a.start-b.start);
 }
+
+function parseTimestampSeconds(raw: string): number {
+  const clean = raw.trim().replace(",", ".");
+  const parts = clean.split(":").map(Number);
+  if (parts.some((n) => !Number.isFinite(n) || n < 0)) return NaN;
+  return parts.reduce((acc, part) => acc * 60 + part, 0);
+}
+
+export function parsePastedTranscript(raw: string): Evidence[] {
+  const lines = raw
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map((line) => line.replace(/<[^>]+>/g, "").trim());
+
+  const timedEntries: { start: number; end?: number; text: string }[] = [];
+  const cueArrow =
+    /^((?:\d{1,2}:)?\d{1,2}:\d{2}(?:[.,]\d{1,3})?)\s*-->\s*((?:\d{1,2}:)?\d{1,2}:\d{2}(?:[.,]\d{1,3})?)/;
+  const standaloneTime = /^\[?\(?((?:\d{1,2}:)?\d{1,2}:\d{2})\)?\]?$/;
+  const inlineTime =
+    /^\[?\(?((?:\d{1,2}:)?\d{1,2}:\d{2})\)?\]?(?:\s*[-–—|:]\s*|\s+)(.+)$/;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line || /^WEBVTT\b/i.test(line) || /^\d+$/.test(line)) continue;
+
+    const arrowMatch = cueArrow.exec(line);
+    if (arrowMatch) {
+      const start = parseTimestampSeconds(arrowMatch[1]);
+      const end = parseTimestampSeconds(arrowMatch[2]);
+      const cueLines: string[] = [];
+      while (i + 1 < lines.length && lines[i + 1] && !cueArrow.test(lines[i + 1])) {
+        if (!/^\d+$/.test(lines[i + 1])) cueLines.push(lines[i + 1]);
+        i++;
+      }
+      const text = cueLines.join(" ").replace(/\s+/g, " ").trim();
+      if (text && Number.isFinite(start)) timedEntries.push({ start, end, text });
+      continue;
+    }
+
+    const soloMatch = standaloneTime.exec(line);
+    if (soloMatch) {
+      const start = parseTimestampSeconds(soloMatch[1]);
+      const textLines: string[] = [];
+      while (
+        i + 1 < lines.length &&
+        lines[i + 1] &&
+        !standaloneTime.test(lines[i + 1]) &&
+        !inlineTime.test(lines[i + 1]) &&
+        !cueArrow.test(lines[i + 1])
+      ) {
+        textLines.push(lines[i + 1]);
+        i++;
+      }
+      const text = textLines.join(" ").replace(/\s+/g, " ").trim();
+      if (text && Number.isFinite(start)) timedEntries.push({ start, text });
+      continue;
+    }
+
+    const sameLineMatch = inlineTime.exec(line);
+    if (sameLineMatch) {
+      const start = parseTimestampSeconds(sameLineMatch[1]);
+      const text = sameLineMatch[2].replace(/\s+/g, " ").trim();
+      if (text && Number.isFinite(start)) timedEntries.push({ start, text });
+    }
+  }
+
+  const segments: Evidence[] = [];
+  if (timedEntries.length > 0) {
+    timedEntries.sort((a, b) => a.start - b.start);
+    for (let i = 0; i < timedEntries.length; i++) {
+      const current = timedEntries[i];
+      const nextStart = timedEntries[i + 1]?.start;
+      const fallbackEnd = current.start + Math.max(2, current.text.split(/\s+/).length * 0.42);
+      const end =
+        current.end && current.end > current.start
+          ? current.end
+          : nextStart && nextStart > current.start
+            ? nextStart
+            : fallbackEnd;
+      for (let offset = 0; offset < current.text.length; offset += 1600) {
+        segments.push({
+          id: `s${segments.length}`,
+          start: current.start,
+          end,
+          text: current.text.slice(offset, offset + 1600),
+        });
+      }
+    }
+    return segments;
+  }
+
+  const words = lines.filter(Boolean).join(" ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+  let cursor = 0;
+  for (let i = 0; i < words.length; i += 32) {
+    const slice = words.slice(i, i + 32).join(" ");
+    const duration = Math.max(3, Math.round(slice.split(" ").length * 0.42));
+    segments.push({
+      id: `s${segments.length}`,
+      start: cursor,
+      end: cursor + duration,
+      text: slice,
+    });
+    cursor += duration;
+  }
+  return segments;
+}
 export function chunks(segments: Evidence[], limit = 10000): Evidence[][] {
   const result: Evidence[][] = []; let current: Evidence[] = [], size = 0;
   for (const segment of segments) {

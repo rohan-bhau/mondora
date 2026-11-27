@@ -7,39 +7,48 @@ async function handle(
     request: NextRequest,
     context: { params: Promise<{ path: string[] }> },
 ): Promise<Response> {
-    if(request.method === "POST") {
+    if (request.method === "POST") {
         const origin = request.headers.get("origin")
 
-        if(origin) {
+        if (origin) {
             let sameOrigin = false;
             try {
                 const url = new URL(origin);
+                const forwardedProto = request.headers
+                    .get("x-forwarded-proto")
+                    ?.split(",")[0]
+                    ?.trim();
+                const expectedProto = forwardedProto
+                    ? `${forwardedProto}:`
+                    : request.nextUrl.protocol;
+                const expectedHost =
+                    request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() ||
+                    request.headers.get("host");
                 sameOrigin =
-                    url.host === request.headers.get("host")  && 
-                    url.protocol === request.nextUrl.protocol;
-            } catch {}
+                    url.host === expectedHost && url.protocol === expectedProto;
+            } catch { }
 
-            if (!sameOrigin) 
+            if (!sameOrigin)
                 return Response.json(
-                    {error: "Cross request origin are not allowed"},
-                    {status: 403}
+                    { error: "Cross request origin are not allowed" },
+                    { status: 403 }
                 )
-            
+
         }
     }
     try {
-        const {path} = await context.params;
+        const { path } = await context.params;
         const body = request.method === "POST" ? await request.json() : {}
-        if(!body || typeof body !== "object" || Array.isArray(body)) 
+        if (!body || typeof body !== "object" || Array.isArray(body))
             throw new Error("Expected a json object")
 
         return Response.json(await dispatch(request.method, path, body), {
-            headers: {"Cache-Control": "no-store"}
+            headers: { "Cache-Control": "no-store" }
         })
     } catch (error) {
         const message = error instanceof Error ? error.message : "The request failed. Plese retry.";
         console.warn(`[studio] ${request.method}:${message}`);
-        return Response.json({error:message}, {status:400})
+        return Response.json({ error: message }, { status: 400 })
     }
 }
 

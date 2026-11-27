@@ -135,7 +135,7 @@ export async function explain(
       .join(" ")
       .toLowerCase();
     const terms = [
-      ...new Set(claim.text.toLowerCase().match(/[a-z]{5,}/g) || []),
+      ...new Set(claim.text.toLowerCase().match(/[\p{L}\p{N}]{4,}/gu) || []),
     ];
     const overlap =
       terms.filter((t) => source.includes(t)).length /
