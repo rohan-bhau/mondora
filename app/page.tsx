@@ -472,10 +472,27 @@ function VideoPlayer({
   );
 }
 
+function createRequestId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 export default function Home() {
   const [video, setVideo] = useState<Video | null>(null),
     [sessions, setSessions] = useState<Session[]>([]),
-    [url, setUrl] = useState("");
+    [url, setUrl] = useState(""),
+    [manualTranscript, setManualTranscript] = useState(""),
+    [showTranscript, setShowTranscript] = useState(false);
   const [selected, setSelected] = useState(0),
     [importing, setImporting] = useState(false),
     [preparing, setPreparing] = useState(false),
@@ -496,7 +513,8 @@ export default function Home() {
     position = useRef(0),
     active = useRef<Video | null>(video),
     selectedRef = useRef(selected),
-    chatEnd = useRef<HTMLDivElement>(null);
+    chatEnd = useRef<HTMLDivElement>(null),
+    transcriptRef = useRef<HTMLTextAreaElement>(null);
   active.current = video;
   selectedRef.current = selected;
   const chapter = video?.chapters[selected];
@@ -611,13 +629,22 @@ export default function Home() {
     setImporting(true);
     setError("");
     try {
+      const trimmedTranscript = manualTranscript.trim();
       const result = await api<{ video: Video; reused: boolean }>("import", {
         url,
+        ...(trimmedTranscript ? { transcript: trimmedTranscript } : {}),
       });
+      setManualTranscript("");
+      setShowTranscript(false);
       enter(result.video, result.reused);
       refresh();
     } catch (e) {
-      setError((e as Error).message);
+      const message = (e as Error).message;
+      setError(message);
+      if (/transcript|caption|blocked|429|refused/i.test(message)) {
+        setShowTranscript(true);
+        setTimeout(() => transcriptRef.current?.focus(), 50);
+      }
     } finally {
       setImporting(false);
     }
@@ -670,7 +697,7 @@ export default function Home() {
     if (!video || !chapter || !question.trim() || chatBusy) return;
     const q = question.trim();
     setQuestion("");
-    await sendQuestion(q, crypto.randomUUID());
+    await sendQuestion(q, createRequestId());
   }
   async function sendQuestion(q: string, requestId: string) {
     if (!video || !chapter || chatBusy) return;
@@ -789,8 +816,12 @@ export default function Home() {
                   <Icon name="link" size={21} />
                   <input
                     id="youtube-url"
+                    name="url"
                     type="url"
                     required
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
                     placeholder="Paste a YouTube video link"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
@@ -798,8 +829,13 @@ export default function Home() {
                   />
                 </div>
                 <button
+                  type="submit"
                   className="primary hero-submit"
-                  disabled={importing || !url.trim()}
+                  disabled={
+                    importing ||
+                    !url.trim() ||
+                    (showTranscript && !manualTranscript.trim())
+                  }
                 >
                   {importing ? (
                     <>
@@ -814,6 +850,45 @@ export default function Home() {
                   )}
                 </button>
               </div>
+              <div className="transcript-actions">
+                <button
+                  type="button"
+                  className="transcript-toggle"
+                  aria-expanded={showTranscript}
+                  aria-controls="manual-transcript-panel"
+                  onClick={() => setShowTranscript((open) => !open)}
+                >
+                  <Icon name="book" size={14} />
+                  {showTranscript
+                    ? "Hide manual transcript"
+                    : "Paste transcript manually"}
+                </button>
+              </div>
+              {showTranscript && (
+                <div id="manual-transcript-panel" className="transcript-panel">
+                  <label htmlFor="manual-transcript">Video transcript</label>
+                  <p id="transcript-help" className="transcript-help">
+                    On YouTube, open the video description, click{" "}
+                    <strong>Show transcript</strong>, then copy and paste it
+                    here (timestamps or .srt/.vtt supported).
+                  </p>
+                  <textarea
+                    ref={transcriptRef}
+                    id="manual-transcript"
+                    name="transcript"
+                    rows={6}
+                    maxLength={500000}
+                    aria-describedby="transcript-help"
+                    placeholder={"0:00\nIntroduction to the lesson...\n0:18\nCore concept explained..."}
+                    value={manualTranscript}
+                    onChange={(e) => {
+                      setManualTranscript(e.target.value);
+                      if (error) setError("");
+                    }}
+                    disabled={importing}
+                  />
+                </div>
+              )}
             </form>
             <div className="hero-outcomes" aria-label="Learning tools">
               <span>
@@ -1532,7 +1607,11 @@ export default function Home() {
                       rows={2}
                       disabled={!chapter}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
+                        if (
+                          e.key === "Enter" &&
+                          !e.shiftKey &&
+                          !e.nativeEvent.isComposing
+                        ) {
                           e.preventDefault();
                           e.currentTarget.form?.requestSubmit();
                         }

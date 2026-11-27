@@ -1670,6 +1670,73 @@ html {
     0 18px 55px #0005,
     0 0 42px #4263eb14;
 }
+.transcript-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.transcript-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #111a2ecc;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.transcript-toggle:hover:not(:disabled) {
+  border-color: var(--green);
+  color: var(--ink);
+  background: var(--pale);
+}
+.transcript-panel {
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #0f172ae6;
+  text-align: left;
+}
+.home-introduction .import-card .transcript-panel label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.transcript-help {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.transcript-panel textarea {
+  width: 100%;
+  min-height: 132px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--input);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.transcript-panel textarea:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+@media (min-width: 701px) {
+  .home-introduction:has(.transcript-panel) {
+    padding-bottom: 132px;
+  }
+}
 .hero-steps {
   color: var(--muted);
 }
