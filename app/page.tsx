@@ -21,6 +21,23 @@ declare global {
     onYouTubeIframeAPIReady?: () => void;
   }
 }
+function MindoraLogo(): React.ReactElement {
+  return (
+    <svg
+      viewBox="56 60 400 370"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        fill="#6200E9"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M 403 187 L 396 186 L 390 188 L 380 194 L 373 201 L 368 208 L 361 226 L 354 233 L 351 234 L 341 234 L 337 232 L 332 227 L 319 198 L 315 192 L 305 183 L 296 183 L 285 188 L 274 196 L 268 202 L 262 213 L 262 223 L 261 224 L 261 389 L 288 369 L 317 354 L 351 343 L 355 343 L 371 339 L 376 339 L 377 338 L 396 336 L 399 335 L 403 331 L 405 327 L 405 191 Z M 74 188 L 73 192 L 73 355 L 77 365 L 82 369 L 85 370 L 99 370 L 100 371 L 130 372 L 131 373 L 138 373 L 139 374 L 145 374 L 146 375 L 167 378 L 187 383 L 207 390 L 230 401 L 245 411 L 251 413 L 259 413 L 266 411 L 289 396 L 291 396 L 305 389 L 323 383 L 343 378 L 363 375 L 364 374 L 370 374 L 371 373 L 389 372 L 390 371 L 425 370 L 431 367 L 435 362 L 437 356 L 437 191 L 434 185 L 430 183 L 422 183 L 417 188 L 417 328 L 414 336 L 408 342 L 399 346 L 380 348 L 374 350 L 359 352 L 343 356 L 333 360 L 330 360 L 327 362 L 317 365 L 305 371 L 288 382 L 266 401 L 257 404 L 249 403 L 243 400 L 229 387 L 216 377 L 194 365 L 172 357 L 169 357 L 157 353 L 153 353 L 137 349 L 132 349 L 131 348 L 126 348 L 125 347 L 118 347 L 117 346 L 108 345 L 98 338 L 95 333 L 94 325 L 93 324 L 93 188 L 88 183 L 80 183 L 76 185 Z M 109 157 L 106 160 L 105 163 L 105 305 L 106 306 L 106 328 L 110 334 L 114 336 L 151 341 L 171 346 L 192 353 L 213 363 L 226 371 L 249 389 L 248 388 L 249 387 L 249 214 L 246 207 L 237 197 L 228 190 L 218 184 L 194 173 L 173 166 L 149 160 L 145 160 L 140 158 L 134 158 L 126 156 L 112 156 Z M 406 105 L 403 103 L 398 104 L 387 115 L 386 117 L 387 122 L 392 123 L 405 111 Z M 297 101 L 292 105 L 291 113 L 293 116 L 297 118 L 301 118 L 304 117 L 307 114 L 308 107 L 304 102 Z M 345 87 L 342 91 L 341 99 L 336 115 L 327 130 L 320 137 L 313 142 L 303 147 L 289 151 L 285 151 L 281 153 L 280 158 L 283 160 L 306 167 L 320 176 L 331 189 L 336 199 L 342 218 L 345 221 L 349 221 L 351 219 L 356 203 L 362 191 L 368 183 L 383 171 L 395 165 L 413 160 L 415 158 L 415 155 L 412 152 L 398 149 L 385 144 L 374 136 L 361 121 L 356 111 L 350 88 Z M 385 77 L 380 80 L 373 93 L 372 99 L 375 102 L 378 102 L 381 100 L 389 84 L 389 80 Z"
+      />
+    </svg>
+  );
+}
+
 function Icon({
   name,
   size = 20,
@@ -173,8 +190,8 @@ function SpeechButton({
         onRangeChange?.(null);
       }
     };
-    window.addEventListener("oneminute-speech", stop);
-    return () => window.removeEventListener("oneminute-speech", stop);
+    window.addEventListener("mindora-speech", stop);
+    return () => window.removeEventListener("mindora-speech", stop);
   }, [id, onRangeChange]);
 
   function toggleSpeech() {
@@ -187,7 +204,7 @@ function SpeechButton({
     }
 
     window.speechSynthesis.cancel();
-    window.dispatchEvent(new CustomEvent("oneminute-speech", { detail: id }));
+    window.dispatchEvent(new CustomEvent("mindora-speech", { detail: id }));
     const utterance = new SpeechSynthesisUtterance(text.trim());
     const voices = window.speechSynthesis.getVoices();
     utterance.voice =
@@ -574,7 +591,7 @@ export default function Home() {
     setQuestion("");
     setTab("explanation");
     history.replaceState(null, "", `?video=${v.id}`);
-    localStorage.setItem("oneminute-last-video", v.id);
+    localStorage.setItem("mindora-last-video", v.id);
     if (!v.chapters.length) void prepare(v);
   }
   const enterRef = useRef(enter);
@@ -704,16 +721,12 @@ export default function Home() {
         <button
           className="brand"
           onClick={leave}
-          aria-label="OneMinute Learn home"
+          aria-label="Mindora home"
         >
           <span className="brand-mark">
-            <span />
-            <span />
-            <span />
+            <MindoraLogo />
           </span>
-          <span>
-            OneMinute<span className="brand-studio"> Learn</span>
-          </span>
+          <span>Mindora</span>
         </button>
         {!video && (
           <nav className="landing-nav" aria-label="Main navigation">
@@ -724,10 +737,10 @@ export default function Home() {
             </a>
             <Link
               className="github-link"
-              href={"https://github.com/shahriarsajeeb/OneMinute-Learn"}
+              href={"https://github.com/rohan-bhau/mondora"}
               target="_blank"
               rel="noreferrer"
-              aria-label="View OneMinute Learn on GitHub"
+              aria-label="View Mindora on GitHub"
             >
               <Icon name="github" size={19} />
             </Link>
@@ -901,7 +914,7 @@ export default function Home() {
             </div>
             <div
               className="product-preview"
-              aria-label="OneMinute Learn study interface preview"
+              aria-label="Mindora study interface preview"
             >
               <div className="preview-bar">
                 <span />
@@ -1061,7 +1074,7 @@ export default function Home() {
                 <div>
                   <h3>Paste a YouTube link</h3>
                   <p>
-                    OneMinute Learn imports the metadata and timestamped
+                    Mindora imports the metadata and timestamped
                     captions.
                   </p>
                 </div>
@@ -1099,7 +1112,7 @@ export default function Home() {
                 More than a summary. A place to actually study.
               </h2>
               <p>
-                Use OneMinute Learn when a video deserves more than a quick
+                Use Mindora when a video deserves more than a quick
                 watch. The lesson stays organized, searchable through
                 conversation, and ready when you come back.
               </p>
@@ -1144,13 +1157,9 @@ export default function Home() {
             <div className="footer-inner">
               <div className="footer-brand">
                 <span className="brand-mark">
-                  <span />
-                  <span />
-                  <span />
+                  <MindoraLogo />
                 </span>
-                <strong>
-                  OneMinute <em>Learn</em>
-                </strong>
+                <strong>Mindora</strong>
               </div>
               <p>Turn YouTube videos into your personal classroom.</p>
               <nav aria-label="Footer navigation">
@@ -1158,7 +1167,7 @@ export default function Home() {
                 <a href="#how-it-works">How it works</a>
                 <a href="#start-learning">Start learning</a>
               </nav>
-              <small>Copyright © 2026 OneMinute Stack Inc.</small>
+              <small>Copyright © 2026 Mindora.</small>
             </div>
           </footer>
         </main>

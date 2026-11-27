@@ -14,8 +14,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mindora - Your Personal Classroom",
-  description: "Turn YouTube videos into your personal classroom. Study clear chapters, replay source moments, and learn with your local AI tutor.",
+  title: "Mindora — Your Personal Classroom",
+  applicationName: "Mindora",
+  description:
+    "Turn YouTube videos into your personal classroom. Study clear chapters, replay source moments, and learn with your local AI tutor.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

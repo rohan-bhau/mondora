@@ -16,7 +16,7 @@ const RATE_LIMIT_MESSAGE =
 const ytDlpBin = () =>
   process.env.YTDLP_BIN?.trim() || resolve(process.cwd(), ".venv/bin/yt-dlp");
 async function downloadCaptionsWithYtDlp(id: string, language: string) {
-  const directory = await mkdtemp(join(tmpdir(), "oneminute-captions-"));
+  const directory = await mkdtemp(join(tmpdir(), "mindora-captions-"));
   try {
     await run(
       ytDlpBin(),
@@ -109,7 +109,7 @@ export async function importYouTube(id: string): Promise<StoredVideo> {
   const track = candidates[0];
   if (!track)
     throw new Error(
-      "Captions are unavailable for this video. OneMinute Learn needs manual or automatic captions to build a grounded study session.",
+      "Captions are unavailable for this video. Mindora needs manual or automatic captions to build a grounded study session.",
     );
   let segments;
   try {

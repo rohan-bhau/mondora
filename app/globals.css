@@ -1798,7 +1798,7 @@ button:hover:not(:disabled) {
   color: #6c6c6c;
 }
 
-/* OneMinute Learn — dark classroom design system */
+/* Mindora — dark classroom design system */
 :root {
   color-scheme: dark;
   --paper: #0d0d0d;
@@ -3398,7 +3398,7 @@ summary:focus-visible {
   padding-top: 24px;
 }
 
-/* OneMinute Learn: warm paper, cobalt actions, expressive type. */
+/* Mindora: warm paper, cobalt actions, expressive type. */
 @font-face {
   font-family: "Bricolage Grotesque";
   src: url("/fonts/bricolage-grotesque.ttf") format("truetype");
@@ -4244,4 +4244,4 @@ button:disabled {
     font-size: 14px;
   }
 }
-/* OneMinute Learn dark identity. Shared tokens keep every screen and state aligned. */
+/* Mindora dark identity. Shared tokens keep every screen and state aligned. */
