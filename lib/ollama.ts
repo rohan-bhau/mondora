@@ -1,4 +1,4 @@
-import type { ModelOutput } from "./types.ts";
+import type { ModelOutput } from "./types";
 export async function generate(
   system: string,
   prompt: string,

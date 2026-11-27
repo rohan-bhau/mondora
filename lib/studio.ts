@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { videoId, chunks, chapterSegments, retrieve } from "./core.ts";
-import { importYouTube } from "./youtube.ts";
-import { summary, SUMMARY_VERSION } from "./summaries.ts";
-import { outline } from "./chapters.ts";
-import { explain } from "./tutor.ts";
-import * as storage from "./strapi.ts";
-import type { StoredVideo, Video } from "./types.ts";
+import { videoId, chunks, chapterSegments, retrieve } from "./core";
+import { importYouTube } from "./youtube";
+import { summary, SUMMARY_VERSION } from "./summaries";
+import { outline } from "./chapters";
+import { explain } from "./tutor";
+import * as storage from "./strapi";
+import type { StoredVideo, Video } from "./types";
 // The local app runs in one Node process. Retain locks through Next development reloads.
 const globalLocks = globalThis as typeof globalThis & {
   studioLocks?: Map<string, Promise<unknown>>;

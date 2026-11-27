@@ -1,6 +1,6 @@
-import { chunks } from "./core.ts";
-import { generate } from "./ollama.ts";
-import type { StoredVideo, Save } from "./types.ts";
+import { chunks } from "./core";
+import { generate } from "./ollama";
+import type { StoredVideo, Save } from "./types";
 export async function outline(video: StoredVideo, save: Save): Promise<void> {
   const batches = chunks(video.segments);
   video.outlineNotes ||= [];

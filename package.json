@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+  "dev": "node scripts/dev.mjs",
     "build": "next build",
+    "dev:server": "npm run dev --prefix strapi",
+    "setup:local" : "node scripts/setup.mjs",
     "start": "next start",
     "lint": "eslint"
   },

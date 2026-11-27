@@ -1,4 +1,4 @@
-import type { StoredVideo, LearningNote } from "./types.ts";
+import type { StoredVideo, LearningNote } from "./types";
 export type VideoDocument = {
   documentId: string;
   youtubeId: string;

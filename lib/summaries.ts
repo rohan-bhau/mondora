@@ -1,12 +1,12 @@
-import { groundClaims, chunks, chapterSegments } from "./core.ts";
-import { generate } from "./ollama.ts";
+import { groundClaims, chunks, chapterSegments } from "./core";
+import { generate } from "./ollama";
 import type {
   StoredVideo,
   StoredChapter,
   Save,
   Answer,
   Evidence,
-} from "./types.ts";
+} from "./types";
 export const SUMMARY_VERSION = 5;
 export async function summary(
   video: StoredVideo,

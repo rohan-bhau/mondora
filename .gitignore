@@ -32,6 +32,23 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+!strapi/.env.example
+
+# python venv
+/.venv/
+
+# strapi
+strapi/node_modules/
+strapi/dist/
+strapi/build/
+strapi/.cache/
+strapi/.tmp/
+strapi/.strapi/
+strapi/.strapi-updater.json
+strapi/types/generated/
+strapi/public/uploads/*
+!strapi/public/uploads/.gitkeep
 
 # vercel
 .vercel

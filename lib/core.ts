@@ -1,4 +1,4 @@
-import type {Answer, Claim, Evidence, Chapter, StoredVideo, Message, ModelOutput, YouTubeMetadata} from './types.ts';
+import type {Answer, Claim, Evidence, Chapter, StoredVideo, Message, ModelOutput, YouTubeMetadata} from './types';
 export function videoId(input: string) {
   let url;
   try { url = new URL(input); } catch { throw new Error('Paste a valid YouTube URL.'); }

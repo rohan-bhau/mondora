@@ -3,8 +3,8 @@ import { promisify } from "node:util";
 import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { parseCaptions, creatorChapters } from "./core.ts";
-import type { StoredVideo, YouTubeMetadata } from "./types.ts";
+import { parseCaptions, creatorChapters } from "./core";
+import type { StoredVideo, YouTubeMetadata } from "./types";
 const run = promisify(execFile);
 const YOUTUBE_HEADERS = {
   "Accept-Language": "en-US,en;q=0.9",
