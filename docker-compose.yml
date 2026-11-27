@@ -1,0 +1,17 @@
+services:
+  mindora:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mindora
+    restart: unless-stopped
+    mem_limit: 5g
+    env_file:
+      - .env.production
+    ports:
+      - "${WEB_PORT:-3080}:3000"
+    volumes:
+      - mindora_data:/data
+
+volumes:
+  mindora_data:

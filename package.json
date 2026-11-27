@@ -8,6 +8,8 @@
     "dev:server": "npm run dev --prefix strapi",
     "setup:local" : "node scripts/setup.mjs",
     "start": "next start",
+    "start:prod": "node scripts/start-prod.mjs",
+    "deploy:vps": "bash scripts/deploy-vps.sh",
     "lint": "eslint"
   },
   "dependencies": {
